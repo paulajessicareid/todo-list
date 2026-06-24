@@ -1,0 +1,203 @@
+:root {
+  /* Colors */
+  --color-bg: #323131;
+  --color-text: #ffffff;
+  --color-text-muted: rgba(255, 255, 255, 0.65);
+  --color-heading: #3bcf73;
+  --color-border: rgba(218, 218, 218, 0.29);
+  --color-accent: #1a815c;
+  --color-accent-muted: rgba(119, 131, 119, 0.1);
+  --color-accent-border: rgba(255, 255, 255, 0.5);
+  --color-on-accent: #ffffff;
+  --color-completed: #c66c40;
+  --color-danger: #efd844;
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px,
+    rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 24px;
+  --space-xl: 48px;
+
+  /* Typography */
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Rubik', sans-serif;
+  --font-size-sm: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 20px;
+  --font-size-xl: 26px;
+  --font-weight-heading: 900;
+  --line-height: 1.45;
+  --letter-spacing: 0.18px;
+  --letter-spacing-heading: -0.5px;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+
+  font: var(--font-size-md) / var(--line-height) var(--font-body);
+  letter-spacing: var(--letter-spacing);
+  color-scheme: dark;
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-size: var(--font-size-sm);
+  margin: 0;
+  min-height: 100svh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-lg);
+  box-sizing: border-box;
+  color: var(--color-text);
+}
+
+h1 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-heading);
+  margin: 0 0 var(--space-lg);
+  letter-spacing: var(--letter-spacing-heading);
+}
+
+#app {
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-xl);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  box-sizing: border-box;
+}
+
+#todo-form {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+#todo-input {
+  flex: 1;
+  font: inherit;
+  padding: 10px var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  box-sizing: border-box;
+}
+
+#todo-input:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-color: var(--color-accent-border);
+}
+
+#todo-form button {
+  font: inherit;
+  padding: 10px var(--space-lg);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+#todo-form button:hover {
+  opacity: 0.9;
+}
+
+#todo-form button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+#todo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#todo-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+#todo-list li:last-child {
+  border-bottom: none;
+}
+
+#todo-list li.empty-state {
+  justify-content: center;
+  color: var(--color-text-muted);
+  border-bottom: none;
+  padding: var(--space-lg) 0;
+}
+
+.todo-text {
+  flex: 1;
+  color: var(--color-text);
+}
+
+#todo-list li.completed .todo-text {
+  color: var(--color-completed);
+  text-decoration: line-through;
+}
+
+.delete-btn {
+  font: inherit;
+  font-size: var(--font-size-sm);
+  padding: var(--space-xs) 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.delete-btn:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.delete-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--color-completed);
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  #app {
+    padding: var(--space-lg) var(--space-lg);
+  }
+
+  h1 {
+    font-size: var(--font-size-xl);
+  }
+}
