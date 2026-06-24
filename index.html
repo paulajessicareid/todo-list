@@ -18,6 +18,32 @@
         <h1 class="todo-title">To Do List</h1>
       </header>
 
+      <section class="auth-bar" id="auth-bar" hidden>
+        <div class="auth-status" id="auth-status"></div>
+        <form class="auth-form" id="auth-form" hidden>
+          <input
+            id="auth-email"
+            class="auth-input"
+            type="email"
+            placeholder="Email"
+            autocomplete="email"
+            required
+          />
+          <input
+            id="auth-password"
+            class="auth-input"
+            type="password"
+            placeholder="Password"
+            autocomplete="current-password"
+            required
+          />
+          <button type="submit" class="auth-submit" id="auth-submit">Sign up</button>
+          <button type="button" class="auth-toggle" id="auth-toggle">
+            Already have an account? Log in
+          </button>
+        </form>
+      </section>
+
       <p class="todo-error" hidden></p>
 
       <form id="todo-form" class="todo-form">
