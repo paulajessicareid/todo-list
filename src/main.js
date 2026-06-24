@@ -1,6 +1,7 @@
 import './style.css'
 import {
   getTodos,
+  getError,
   loadTodos,
   addTodo,
   toggleTodo,
@@ -10,10 +11,31 @@ import {
 const form = document.querySelector('#todo-form')
 const input = document.querySelector('#todo-input')
 const list = document.querySelector('#todo-list')
+const addButton = document.querySelector('.todo-add-button')
+const errorEl = document.querySelector('.todo-error')
+
+let loading = true
+
+function renderError() {
+  if (!errorEl) return
+  const error = getError()
+  errorEl.textContent = error ?? ''
+  errorEl.hidden = !error
+}
 
 function render() {
-  const todos = getTodos()
+  renderError()
   list.innerHTML = ''
+
+  if (loading) {
+    const empty = document.createElement('li')
+    empty.className = 'empty-state'
+    empty.textContent = 'Loading...'
+    list.append(empty)
+    return
+  }
+
+  const todos = getTodos()
 
   if (todos.length === 0) {
     const empty = document.createElement('li')
@@ -30,8 +52,8 @@ function render() {
     const checkbox = document.createElement('input')
     checkbox.type = 'checkbox'
     checkbox.checked = todo.completed
-    checkbox.addEventListener('change', () => {
-      toggleTodo(todo.id)
+    checkbox.addEventListener('change', async () => {
+      await toggleTodo(todo.id)
       render()
     })
 
@@ -43,8 +65,8 @@ function render() {
     deleteBtn.type = 'button'
     deleteBtn.className = 'delete-btn'
     deleteBtn.textContent = 'Delete'
-    deleteBtn.addEventListener('click', () => {
-      deleteTodo(todo.id)
+    deleteBtn.addEventListener('click', async () => {
+      await deleteTodo(todo.id)
       render()
     })
 
@@ -53,12 +75,21 @@ function render() {
   }
 }
 
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault()
-  addTodo(input.value)
+  addButton.disabled = true
+  await addTodo(input.value)
   input.value = ''
+  addButton.disabled = false
   render()
 })
 
-loadTodos()
-render()
+async function init() {
+  loading = true
+  render()
+  await loadTodos()
+  loading = false
+  render()
+}
+
+init()

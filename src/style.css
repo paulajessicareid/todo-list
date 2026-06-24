@@ -5,7 +5,7 @@
   --color-text-muted: rgba(255, 255, 255, 0.65);
   --color-heading: #3bcf73;
   --color-border: rgba(218, 218, 218, 0.29);
-  --color-accent: #1a815c;
+  --color-accent: #3bcf73;
   --color-accent-muted: rgba(119, 131, 119, 0.1);
   --color-accent-border: rgba(255, 255, 255, 0.5);
   --color-on-accent: #ffffff;
@@ -83,6 +83,19 @@ body {
 
 .todo-header {
   margin-bottom: var(--space-lg);
+}
+
+.todo-error {
+  margin: 0 0 var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  font-size: var(--font-size-sm);
+}
+
+.todo-error[hidden] {
+  display: none;
 }
 
 .todo-title {

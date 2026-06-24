@@ -1,45 +1,75 @@
-const STORAGE_KEY = 'todolist-app-todos'
+import { supabase } from './supabase.js'
 
 let todos = []
+let lastError = null
 
 export function getTodos() {
   return todos
 }
 
-export function loadTodos() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    todos = stored ? JSON.parse(stored) : []
-  } catch {
+export function getError() {
+  return lastError
+}
+
+export async function loadTodos() {
+  lastError = null
+  const { data, error } = await supabase
+    .from('todos')
+    .select('id, text, completed, created_at')
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    lastError = error.message
     todos = []
+    return
   }
+
+  todos = data
 }
 
-export function saveTodos() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos))
-}
-
-export function addTodo(text) {
+export async function addTodo(text) {
   const trimmed = text.trim()
   if (!trimmed) return
 
-  todos.push({
-    id: crypto.randomUUID(),
-    text: trimmed,
-    completed: false,
-  })
-  saveTodos()
-}
+  lastError = null
+  const { error } = await supabase
+    .from('todos')
+    .insert({ text: trimmed, completed: false })
 
-export function toggleTodo(id) {
-  const todo = todos.find((t) => t.id === id)
-  if (todo) {
-    todo.completed = !todo.completed
-    saveTodos()
+  if (error) {
+    lastError = error.message
+    return
   }
+
+  await loadTodos()
 }
 
-export function deleteTodo(id) {
-  todos = todos.filter((t) => t.id !== id)
-  saveTodos()
+export async function toggleTodo(id) {
+  const todo = todos.find((t) => t.id === id)
+  if (!todo) return
+
+  lastError = null
+  const { error } = await supabase
+    .from('todos')
+    .update({ completed: !todo.completed })
+    .eq('id', id)
+
+  if (error) {
+    lastError = error.message
+    return
+  }
+
+  await loadTodos()
+}
+
+export async function deleteTodo(id) {
+  lastError = null
+  const { error } = await supabase.from('todos').delete().eq('id', id)
+
+  if (error) {
+    lastError = error.message
+    return
+  }
+
+  await loadTodos()
 }
