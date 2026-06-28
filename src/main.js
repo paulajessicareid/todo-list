@@ -8,7 +8,9 @@ import {
   toggleTodo,
   deleteTodo,
   updateTodoPriority,
+  updateTodoColor,
   PRIORITIES,
+  TODO_COLORS,
   EMPTY_TODO_MESSAGE,
 } from './todos.js'
 import {
@@ -27,6 +29,7 @@ import { celebrate } from './celebrate.js'
 const form = document.querySelector('#todo-form')
 const input = document.querySelector('#todo-input')
 const filterSelect = document.querySelector('#todo-filter')
+const prioritySortSelect = document.querySelector('#todo-priority-sort')
 const showCompletedToggle = document.querySelector('#todo-show-completed')
 const list = document.querySelector('#todo-list')
 const addButton = document.querySelector('.todo-add-button')
@@ -44,8 +47,10 @@ let loading = true
 let authMode = 'signup'
 let showAuthForm = false
 let filterPriority = 'all'
+let sortPriority = 'none'
 let showCompleted = true
 let wasAllComplete = false
+let openColorMenuId = null
 
 function renderError() {
   if (!errorEl) return
@@ -76,6 +81,16 @@ function getVisibleTodos() {
     items = items.filter((t) => t.priority === filterPriority)
   }
 
+  if (sortPriority === 'high-low') {
+    items = [...items].sort(
+      (a, b) => PRIORITIES.indexOf(b.priority) - PRIORITIES.indexOf(a.priority),
+    )
+  } else if (sortPriority === 'low-high') {
+    items = [...items].sort(
+      (a, b) => PRIORITIES.indexOf(a.priority) - PRIORITIES.indexOf(b.priority),
+    )
+  }
+
   return items
 }
 
@@ -96,7 +111,7 @@ function checkCelebration() {
 
 function createPrioritySelect(todo) {
   const select = document.createElement('select')
-  select.className = `todo-priority-select priority-${todo.priority}`
+  select.className = 'todo-priority-select'
   select.setAttribute('aria-label', 'Priority')
 
   for (const priority of PRIORITIES) {
@@ -115,6 +130,69 @@ function createPrioritySelect(todo) {
   })
 
   return select
+}
+
+function createColorPicker(todo) {
+  const wrapper = document.createElement('div')
+  wrapper.className = 'todo-color-picker todo-col-colors'
+  wrapper.addEventListener('click', (e) => e.stopPropagation())
+
+  const current = TODO_COLORS.find((c) => c.id === todo.color)
+  const isOpen = openColorMenuId === todo.id
+
+  const trigger = document.createElement('button')
+  trigger.type = 'button'
+  trigger.className = 'todo-color-trigger'
+  trigger.classList.toggle('has-color', Boolean(current))
+  if (current) {
+    trigger.style.setProperty('--swatch-color', current.hex)
+  }
+  trigger.setAttribute(
+    'aria-label',
+    current ? `Colour: ${current.label}. Click to change` : 'Add colour',
+  )
+  trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false')
+  trigger.setAttribute('aria-haspopup', 'listbox')
+
+  trigger.addEventListener('click', () => {
+    openColorMenuId = isOpen ? null : todo.id
+    render()
+  })
+
+  wrapper.append(trigger)
+
+  if (isOpen) {
+    const menu = document.createElement('div')
+    menu.className = 'todo-color-menu'
+    menu.setAttribute('role', 'listbox')
+    menu.setAttribute('aria-label', 'Choose a colour')
+
+    for (const option of TODO_COLORS) {
+      const swatch = document.createElement('button')
+      swatch.type = 'button'
+      swatch.className = 'todo-color-swatch'
+      swatch.dataset.colorId = option.id
+      swatch.style.setProperty('--swatch-color', option.hex)
+      swatch.setAttribute('role', 'option')
+      swatch.setAttribute('aria-label', option.label)
+      swatch.setAttribute('aria-selected', todo.color === option.id ? 'true' : 'false')
+      swatch.classList.toggle('is-selected', todo.color === option.id)
+
+      swatch.addEventListener('click', async () => {
+        const nextColor = todo.color === option.id ? null : option.id
+        swatch.disabled = true
+        await updateTodoColor(todo.id, nextColor)
+        openColorMenuId = null
+        render()
+      })
+
+      menu.append(swatch)
+    }
+
+    wrapper.append(menu)
+  }
+
+  return wrapper
 }
 
 function createDeleteButton(onDelete) {
@@ -241,6 +319,9 @@ function render() {
   for (const todo of todos) {
     const item = document.createElement('li')
     item.className = todo.completed ? 'completed todo-row' : 'todo-row'
+    if (todo.color) {
+      item.dataset.color = todo.color
+    }
 
     const checkbox = document.createElement('input')
     checkbox.type = 'checkbox'
@@ -256,6 +337,8 @@ function render() {
     text.className = 'todo-text todo-col-text'
     text.textContent = todo.text
 
+    const colorPicker = createColorPicker(todo)
+
     const priorityCell = document.createElement('div')
     priorityCell.className = 'todo-col-priority'
     priorityCell.append(createPrioritySelect(todo))
@@ -269,7 +352,7 @@ function render() {
     })
 
     actionsCell.append(deleteBtn)
-    item.append(checkbox, text, priorityCell, actionsCell)
+    item.append(checkbox, colorPicker, text, priorityCell, actionsCell)
     list.append(item)
   }
 }
@@ -302,9 +385,21 @@ filterSelect.addEventListener('change', () => {
   render()
 })
 
+prioritySortSelect.addEventListener('change', () => {
+  sortPriority = prioritySortSelect.value
+  render()
+})
+
 showCompletedToggle.addEventListener('change', () => {
   showCompleted = showCompletedToggle.checked
   render()
+})
+
+document.addEventListener('click', () => {
+  if (openColorMenuId !== null) {
+    openColorMenuId = null
+    render()
+  }
 })
 
 authForm.addEventListener('submit', async (e) => {

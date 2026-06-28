@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Todo List</title>
+    <title>To Do List</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -13,12 +13,16 @@
     />
   </head>
   <body>
-    <a class="app-logo" href="/" aria-label="Todo List">
-      <img src="/todo-logo.svg" alt="" width="56" height="56" />
-    </a>
-
     <div class="app-shell">
-      <section class="auth-bar" id="auth-bar" hidden>
+      <div class="app-top">
+        <header class="app-brand">
+          <a class="app-brand-link" href="/" aria-label="To Do List">
+            <img class="app-brand-logo" src="/todo-logo.svg" alt="" width="80" height="80" />
+            <h1 class="app-brand-title">To Do List</h1>
+          </a>
+        </header>
+
+        <section class="auth-bar" id="auth-bar" hidden>
         <div class="auth-status" id="auth-status"></div>
         <form class="auth-form" id="auth-form" hidden>
           <input
@@ -42,13 +46,10 @@
             Already have an account? Log in
           </button>
         </form>
-      </section>
+        </section>
+      </div>
 
       <div id="app" class="todo-app">
-        <header class="todo-header">
-          <h1 class="todo-title">To Do List</h1>
-        </header>
-
         <p class="todo-error" hidden></p>
 
       <div class="todo-form-wrap">
@@ -75,6 +76,14 @@
             <option value="high">High</option>
           </select>
         </label>
+        <label class="todo-control">
+          Sort
+          <select id="todo-priority-sort" class="todo-control-select">
+            <option value="none">Default</option>
+            <option value="high-low">High to low</option>
+            <option value="low-high">Low to high</option>
+          </select>
+        </label>
         <label class="todo-control todo-control-toggle">
           Show completed
           <input type="checkbox" id="todo-show-completed" class="todo-show-completed" checked />
@@ -84,6 +93,7 @@
       <div class="todo-table">
         <div class="todo-table-header">
           <span class="todo-col todo-col-check" aria-hidden="true"></span>
+          <span class="todo-col todo-col-colors" aria-hidden="true"></span>
           <span class="todo-col todo-col-text">to-do</span>
           <span class="todo-col todo-col-priority">priority</span>
           <span class="todo-col todo-col-actions" aria-hidden="true"></span>
