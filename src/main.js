@@ -9,6 +9,7 @@ import {
   deleteTodo,
   updateTodoPriority,
   updateTodoColor,
+  updateTodoText,
   PRIORITIES,
   TODO_COLORS,
   EMPTY_TODO_MESSAGE,
@@ -51,6 +52,7 @@ let sortPriority = 'none'
 let showCompleted = true
 let wasAllComplete = false
 let openColorMenuId = null
+let editingTodoId = null
 
 function renderError() {
   if (!errorEl) return
@@ -195,6 +197,84 @@ function createColorPicker(todo) {
   return wrapper
 }
 
+async function saveTodoEdit(todo, newText) {
+  const trimmed = newText.trim()
+  if (!trimmed || trimmed === todo.text) {
+    editingTodoId = null
+    render()
+    return
+  }
+
+  await updateTodoText(todo.id, trimmed)
+  editingTodoId = null
+  render()
+}
+
+function createTodoTextCell(todo) {
+  const cell = document.createElement('div')
+  cell.className = 'todo-text-cell todo-col-text'
+
+  if (editingTodoId === todo.id) {
+    cell.classList.add('is-editing')
+
+    const editInput = document.createElement('input')
+    editInput.type = 'text'
+    editInput.className = 'todo-edit-input'
+    editInput.value = todo.text
+    editInput.setAttribute('aria-label', 'Edit todo')
+
+    const confirmBtn = document.createElement('button')
+    confirmBtn.type = 'button'
+    confirmBtn.className = 'todo-edit-confirm'
+    confirmBtn.setAttribute('aria-label', 'Save todo')
+    confirmBtn.innerHTML = `
+      <svg class="todo-edit-confirm-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path
+          d="M5 10.5 8.2 13.7 15 6.5"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    `
+
+    const save = async () => {
+      confirmBtn.disabled = true
+      editInput.disabled = true
+      await saveTodoEdit(todo, editInput.value)
+    }
+
+    confirmBtn.addEventListener('click', save)
+    editInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        save()
+      } else if (e.key === 'Escape') {
+        editingTodoId = null
+        render()
+      }
+    })
+
+    cell.append(editInput, confirmBtn)
+    cell.dataset.focusEdit = 'true'
+  } else {
+    const text = document.createElement('button')
+    text.type = 'button'
+    text.className = 'todo-text'
+    text.textContent = todo.text
+    text.addEventListener('click', () => {
+      editingTodoId = todo.id
+      openColorMenuId = null
+      render()
+    })
+
+    cell.append(text)
+  }
+
+  return cell
+}
+
 function createDeleteButton(onDelete) {
   const deleteBtn = document.createElement('button')
   deleteBtn.type = 'button'
@@ -333,9 +413,7 @@ function render() {
       checkCelebration()
     })
 
-    const text = document.createElement('span')
-    text.className = 'todo-text todo-col-text'
-    text.textContent = todo.text
+    const textCell = createTodoTextCell(todo)
 
     const colorPicker = createColorPicker(todo)
 
@@ -352,8 +430,14 @@ function render() {
     })
 
     actionsCell.append(deleteBtn)
-    item.append(checkbox, colorPicker, text, priorityCell, actionsCell)
+    item.append(checkbox, colorPicker, textCell, priorityCell, actionsCell)
     list.append(item)
+
+    if (textCell.dataset.focusEdit === 'true') {
+      const editInput = textCell.querySelector('.todo-edit-input')
+      editInput?.focus()
+      editInput?.select()
+    }
   }
 }
 

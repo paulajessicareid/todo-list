@@ -576,11 +576,87 @@ body {
   padding: var(--space-lg) 0;
 }
 
+.todo-text-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
 .todo-text {
   flex: 1;
   min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
   color: var(--color-text);
+  font: inherit;
   font-size: var(--font-size-md);
+  text-align: left;
+  cursor: pointer;
+}
+
+.todo-text:hover {
+  color: var(--color-accent);
+}
+
+.todo-text:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.todo-edit-input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: var(--font-size-md);
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-accent-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.todo-edit-input:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+  border-color: var(--color-accent);
+}
+
+.todo-edit-confirm {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.todo-edit-confirm:hover {
+  opacity: 0.9;
+}
+
+.todo-edit-confirm:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.todo-edit-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.todo-edit-confirm-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .todo-list li.completed .todo-text {

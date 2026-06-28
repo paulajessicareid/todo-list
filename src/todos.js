@@ -81,6 +81,27 @@ export async function toggleTodo(id) {
   await loadTodos()
 }
 
+export async function updateTodoText(id, text) {
+  const trimmed = text.trim()
+  if (!trimmed) return
+
+  lastError = null
+  const todo = todos.find((t) => t.id === id)
+  const { error } = await supabase
+    .from('todos')
+    .update({ text: trimmed })
+    .eq('id', id)
+
+  if (error) {
+    lastError = error.message
+    return
+  }
+
+  if (todo) {
+    todo.text = trimmed
+  }
+}
+
 export async function updateTodoPriority(id, priority) {
   lastError = null
   const { error } = await supabase
